@@ -1,18 +1,30 @@
 name: fetch_prices
+
 on:
-  workflow_dispatch:      # ←★ この 1 行を追加（インデントは左詰め）
+  workflow_dispatch:          # ← 手動実行用トリガー
   schedule:
-    - cron: '0 13 * * 1-5'   # 平日22:00 JST
+    - cron: '0 13 * * 1-5'    # 平日 22:00 JST
+
 jobs:
   update:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
       - name: Setup Python
         uses: actions/setup-python@v4
-        with: {python-version: '3.11'}
-      - name: Run price fetcher
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies        # ★ 依存ライブラリ
+        run: |
+          pip install pandas yfinance requests
+
+      - name: Run price fetcher           # ★ 株価 CSV 生成スクリプト
         run: python scripts/get_prices.py
+
       - name: Commit CSV
         run: |
           git config user.name bot
@@ -20,3 +32,4 @@ jobs:
           git add data/*.csv
           git commit -m "auto: update prices" || echo "no change"
           git push
+
