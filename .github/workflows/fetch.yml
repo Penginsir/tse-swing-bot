@@ -1,5 +1,6 @@
 name: fetch_prices
 on:
+  workflow_dispatch:      # ←★ この 1 行を追加（インデントは左詰め）
   schedule:
     - cron: '0 13 * * 1-5'   # 平日22:00 JST
 jobs:
